@@ -34,7 +34,7 @@ def get_markdown(image_url):
             provider="openai_chat_completion",
             base_url="https://api.tapsage.com",
             model="o4-mini",
-            max_tokens=100
+            max_tokens=500
         )
 
     resp = assistant.start(raw_text)

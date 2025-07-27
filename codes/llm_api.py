@@ -61,7 +61,7 @@ class ChatAssistant:
         }
         self.model = model
         self.max_tokens = max_tokens
-        self.messages = [{"role": "system", "content": "{system_prompt}"}]
+        self.messages = [{"role": "system", "content": system_prompt}]
         self.assistant_type = assistant_type
 
     def start(self,message):
@@ -78,7 +78,7 @@ class ChatAssistant:
         payload = {
             "model": self.model,
             "messages": self.messages,
-            "max_tokens": self.max_tokens
+            "max_completion_tokens": self.max_tokens
         }
         resp = requests.post(self.endpoint, json=payload, headers=self.headers)
         
@@ -104,3 +104,14 @@ class ChatAssistant:
 #         max_tokens=30
 #     )
 #     assistant.start("HELLLO")
+# assistant = ChatAssistant(
+#         api_key="tpsg-MNvTQUAqUL84o4THLV1395IqTBIZHJJ",
+#         # text_to_speech=t2s,
+#         # speech_to_text=s2t,
+#         provider="openai_chat_completion",
+#         base_url="https://api.tapsage.com",
+#         model="o4-mini",
+#         max_tokens=1000
+#     )
+
+# resp = assistant.start("GIVE ME A NEW GAME")
