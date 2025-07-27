@@ -1,3 +1,9 @@
+import sys
+import asyncio
+if sys.platform.startswith("win"):
+    # Windows’ default SelectorEventLoop doesn’t support subprocesses;
+    # switch to Proactor before importing any asyncio/Playwright code.
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 import streamlit as st
 from get_bio_markdown import get_markdown
 

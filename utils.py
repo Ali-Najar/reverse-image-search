@@ -20,7 +20,6 @@ def fetch_plaintext(url, timeout=10, headless=True):
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     }
-
     try:
         resp = requests.get(url, headers=headers, timeout=timeout)
         resp.raise_for_status()
@@ -100,7 +99,6 @@ def _fetch_with_playwright(url, timeout, headless, headers):
         else:
             browser.close()
             raise RuntimeError("Timed out waiting for Cloudflare challenge to clear")
-
         browser.close()
         return _parse_html(html)
 

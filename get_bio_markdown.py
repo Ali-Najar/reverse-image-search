@@ -8,7 +8,7 @@ def get_markdown(image_url):
     url = "https://reverse-image-search1.p.rapidapi.com/reverse-image-search"
 
     # querystring = {"url":"https://media.licdn.com/dms/image/v2/D4E03AQHA8gahzHINPA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1694105527333?e=1754524800&v=beta&t=wBgk_EuzZc0mDAdgtHvohQibta74MeCS7b-HOgL0wlE","limit":"10","safe_search":"off"}
-    querystring = {"url":image_url,"limit":"10","safe_search":"off"}
+    querystring = {"url":image_url,"limit":"5","safe_search":"off"}
 
     headers = {
         "x-rapidapi-key": "442330cd73msh2c111d452cb6be1p14bac9jsn77eedb6d3f72",
@@ -34,9 +34,8 @@ def get_markdown(image_url):
             provider="openai_chat_completion",
             base_url="https://api.tapsage.com",
             model="o4-mini",
-            max_tokens=300
+            max_tokens=100
         )
 
     resp = assistant.start(raw_text)
     return resp
-
