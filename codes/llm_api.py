@@ -78,7 +78,7 @@ class ChatAssistant:
         payload = {
             "model": self.model,
             "messages": self.messages,
-            "max_completion_tokens": self.max_tokens
+            # "max_completion_tokens": self.max_tokens
         }
         resp = requests.post(self.endpoint, json=payload, headers=self.headers)
         

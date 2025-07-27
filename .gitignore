@@ -2,5 +2,5 @@ codes/feature_extraction.py
 codes/preprocessing.py
 codes/question_answering.py
 request.json
-codes/_pycache_
-_pycache_
+codes/__pycache__
+__pycache__

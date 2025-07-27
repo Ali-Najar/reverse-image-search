@@ -11,7 +11,7 @@ def get_markdown(image_url):
     querystring = {"url":image_url,"limit":"5","safe_search":"off"}
 
     headers = {
-        "x-rapidapi-key": "442330cd73msh2c111d452cb6be1p14bac9jsn77eedb6d3f72",
+        "x-rapidapi-key": "d49559bba8msh87cb27666f75b9cp1363e6jsn761c41c132a1",
         "x-rapidapi-host": "reverse-image-search1.p.rapidapi.com"
     }
 
@@ -21,7 +21,6 @@ def get_markdown(image_url):
         json.dump(response.json(), f, indent=2)
 
     links = extract_links_from_file(f"request.json")
-    print("KKFKFK" , links)
     raw_text = ""
     for link in links:
         text = fetch_plaintext(link)
@@ -33,8 +32,8 @@ def get_markdown(image_url):
             # speech_to_text=s2t,
             provider="openai_chat_completion",
             base_url="https://api.tapsage.com",
-            model="gpt-4o-mini",
-            max_tokens=500
+            model="o4-mini",
+            max_tokens=1000
         )
 
     resp = assistant.start(raw_text)

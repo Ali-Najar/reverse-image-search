@@ -57,18 +57,13 @@ with st.form(key="chat_form", clear_on_submit=True):
     url = st.text_input("Paste image URL and press Enter", placeholder="https://...")
     submitted = st.form_submit_button("Enter")
 
-# ------------ Chat display ------------
-st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-for role, content in history:
-    if role == "user":
-        # Display the image instead of raw URL text
-        st.markdown(
-            f'<div class="msg user"><img src="{content}" style="width:200px; border-radius:8px;"/></div>',
-            unsafe_allow_html=True,
-        )
-st.markdown('</div>', unsafe_allow_html=True)
 
 if submitted and url:
+    # Clear previous chat and results
+    st.session_state.history.clear()
+    if "image_url" in st.session_state:
+        del st.session_state.image_url
+
     # Show user message immediately
     history.append(("user", url))
     with st.spinner("Generating result …"):
@@ -89,6 +84,19 @@ if submitted and url:
 assistant_messages = [msg for role, msg in history if role == "assistant"]
 if assistant_messages:
     st.markdown("---")
+    if "image_url" in st.session_state:
+        # Centered image
+        left, center, right = st.columns([1, 2, 1])
+        with center:
+            st.markdown(
+                f"""
+                <div style="text-align: center;">
+                    <img src="{st.session_state.image_url}" width="200" />
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
     st.markdown("### Biography")
     # Display the latest assistant response
     st.markdown(assistant_messages[-1], unsafe_allow_html=True) 
