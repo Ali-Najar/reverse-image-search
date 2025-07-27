@@ -31,9 +31,9 @@ def get_markdown(image_url):
             api_key="tpsg-MNvTQUAqUL84o4THLV1395IqTBIZHJJ",
             # text_to_speech=t2s,
             # speech_to_text=s2t,
-            provider="openai_chat_completion",
+            provider="google",
             base_url="https://api.tapsage.com",
-            model="o4-mini",
+            model="gemini-2.5-pro-preview-06-05",
             max_tokens=300
         )
 
