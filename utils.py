@@ -2,11 +2,6 @@
 import requests
 import json
 from bs4 import BeautifulSoup
-import undetected_chromedriver as uc
-from requests.exceptions import HTTPError
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
 from requests.exceptions import RequestException
 import time
 from playwright.sync_api import sync_playwright
