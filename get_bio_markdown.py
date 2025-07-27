@@ -21,7 +21,7 @@ def get_markdown(image_url):
         json.dump(response.json(), f, indent=2)
 
     links = extract_links_from_file(f"request.json")
-
+    print("KKFKFK" , links)
     raw_text = ""
     for link in links:
         text = fetch_plaintext(link)
