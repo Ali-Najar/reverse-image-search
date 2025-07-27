@@ -1,0 +1,41 @@
+{
+  "status": "OK",
+  "request_id": "02f920bf-4bab-48ac-a4d5-738d6419658c",
+  "parameters": {
+    "url": "https://www.sharifps.ir/_next/image?url=%2Fimages%2Fassistants%2Fshayan_baghayi_nejad.jpg&w=3840&q=75",
+    "safe_search": "off",
+    "limit": 10
+  },
+  "data": [
+    {
+      "title": "Team - Probability &amp; Statistics Course - Sharif University of Technology",
+      "link": "https://www.sharifps.ir/team",
+      "domain": "www.sharifps.ir",
+      "logo": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.sharifps.ir&client=HORIZON&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL&nfrp=2",
+      "date": null,
+      "image": null,
+      "image_width": 1280,
+      "image_height": 1280
+    },
+    {
+      "title": "10+ \"Shayan Nejad\" profiles - LinkedIn",
+      "link": "https://www.linkedin.com/pub/dir/Shayan/Nejad",
+      "domain": "www.linkedin.com",
+      "logo": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.linkedin.com&client=HORIZON&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL&nfrp=2",
+      "date": null,
+      "image": null,
+      "image_width": 200,
+      "image_height": 200
+    },
+    {
+      "title": "Linear Algebra: CE282",
+      "link": "https://jabrekh.github.io/",
+      "domain": "jabrekh.github.io",
+      "logo": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://jabrekh.github.io&client=HORIZON&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL&nfrp=2",
+      "date": null,
+      "image": null,
+      "image_width": 1280,
+      "image_height": 1280
+    }
+  ]
+}
