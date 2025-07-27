@@ -33,7 +33,7 @@ def get_markdown(image_url):
             # speech_to_text=s2t,
             provider="openai_chat_completion",
             base_url="https://api.tapsage.com",
-            model="gpt-4o",
+            model="o4-mini",
             max_tokens=300
         )
 
