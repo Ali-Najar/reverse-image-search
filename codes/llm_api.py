@@ -8,7 +8,8 @@ system_prompt = """
   Your task is to create a biography of the main person mentioned in the text and return it please in MARKDOWN format and structured.
   The biography should include the person's name, job, birth date and other relevant information if available.
   Ignore the other content of the text just focus on the biography of the person. Also just focus on one person which is the main person of the text and don't mention others.
-  GIVE THE RESULT IN ENGLISH.
+  PLEASE ONLY TALK ABOUT THE PERSON AND DON'T MENTION THE SITE TEXTS I GAVE YOU OR ANYTHING ELSE.
+  GIVE THE BIOGRAPHY IN ENGLISH.
   """
 
 class ChatAssistant:
