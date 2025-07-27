@@ -2,7 +2,6 @@
 import requests
 import json
 from bs4 import BeautifulSoup
-import cloudscraper
 import undetected_chromedriver as uc
 from requests.exceptions import HTTPError
 from selenium.webdriver.support.ui import WebDriverWait
