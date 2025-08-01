@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 import time
 from playwright.sync_api import sync_playwright
+from codes imp
 
 def fetch_plaintext(url, timeout=10, headless=True):
     """
@@ -110,3 +111,17 @@ def _parse_html(html):
         tag.decompose()
     text = soup.get_text(separator=" ", strip=True)
     return text, soup
+
+
+def upload_image_imgbb(api_key, image_path):
+    url = "https://api.imgbb.com/1/upload"
+    with open(image_path, "rb") as image_file:
+        payload = {
+            "key": api_key,
+            "image": image_file.read(),
+        }
+        response = requests.post(url, files={"image": (image_path, image_file)}, data={"key": api_key})
+        if response.status_code == 200:
+            return response.json()['data']['url']
+        else:
+            raise Exception(f"Upload failed: {response.text}")
