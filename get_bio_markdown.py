@@ -1,11 +1,24 @@
 import requests
 import json
 from codes.llm_api import ChatAssistant
-from utils import fetch_plaintext, extract_links_from_file, _fetch_with_playwright
+import os
+from utils import fetch_plaintext, extract_links_from_file, prepare_and_upload
+
+IMGBB_API_KEY = "9e1aef25f19ff71c6163cf7659cc644a"
 
 
 def get_markdown(image_url):
     url = "https://reverse-image-search1.p.rapidapi.com/reverse-image-search"
+    
+    if isinstance(image_url, str) and os.path.exists(image_url): # is file
+        image_url = prepare_and_upload(IMGBB_API_KEY, image_url)
+    else:
+        image_req = requests.get(image_url)
+        if image_req.status_code == 200:
+            with open("data/tmp_img.png", "wb") as file:
+                file.write(response.content)
+        
+        image_url = prepare_and_upload(IMGBB_API_KEY, "data/tmp_img.png")
 
     # querystring = {"url":"https://media.licdn.com/dms/image/v2/D4E03AQHA8gahzHINPA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1694105527333?e=1754524800&v=beta&t=wBgk_EuzZc0mDAdgtHvohQibta74MeCS7b-HOgL0wlE","limit":"10","safe_search":"off"}
     querystring = {"url":image_url,"limit":"5","safe_search":"off"}

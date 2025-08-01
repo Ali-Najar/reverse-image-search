@@ -116,7 +116,7 @@ def _parse_html(html):
     return text, soup
 
 
-def upload_image_imgbb(api_key, image_path):
+def prepare_and_upload(api_key, image_path):
     url = "https://api.imgbb.com/1/upload"
     face = prepare_face(image_path)  # Returns numpy ndarray in BGR format
     face_rgb = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB

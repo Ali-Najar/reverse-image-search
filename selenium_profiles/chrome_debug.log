@@ -1,3 +1,0 @@
-[1978435:1978435:0601/033544.336086:WARNING:ui/linux/display_server_utils.cc:92] This is not a Wayland session. Falling back to X11. If you need to run Chrome on Wayland using some embedded compositor, e.g. Weston, please specify Wayland as your preferred Ozone platform, or use --ozone-platform=wayland.
-[1978435:1978435:0601/033544.341395:ERROR:ui/ozone/platform/x11/ozone_platform_x11.cc:248] Missing X server or $DISPLAY
-[1978435:1978435:0601/033544.341426:ERROR:ui/aura/env.cc:257] The platform failed to initialize.  Exiting.
