@@ -8,11 +8,12 @@ from pathlib import Path
 import cv2
 import numpy as np
 import face_recognition
-# import torch
-# from facenet_pytorch import MTCNN
+import argparse
+import torch
+from facenet_pytorch import MTCNN
 
-# _DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
-# _mtcnn = MTCNN(image_size=160, margin=14, device=_DEVICE)
+_DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
+_mtcnn = MTCNN(image_size=160, margin=14, device=_DEVICE)
 
 def _denoise(img_bgr: np.ndarray) -> np.ndarray:
     """Edge-preserving bilateral filter."""
@@ -28,7 +29,6 @@ def _adjust_contrast_brightness(img_bgr: np.ndarray, gamma: float = 1.2) -> np.n
     lab = cv2.merge((l, a, b))
     img_clahe = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
-    # gamma LUT
     lut = np.array([((i / 255.0) ** (1 / gamma)) * 255 for i in range(256)]).astype(
         "uint8"
     )
@@ -71,12 +71,7 @@ def prepare_face(input_path):
     return img_bgr
 
 
-# --------------------------------------------------
-# Optional CLI
-# --------------------------------------------------
 if __name__ == "__main__":
-    import argparse, sys
-
     parser = argparse.ArgumentParser(description="Step-1 face pre-processing")
     parser.add_argument("--input", help="Path to input image")
     parser.add_argument(

@@ -4,16 +4,16 @@ import requests
 from bs4 import BeautifulSoup
 from transformers import pipeline
 from dateutil.parser import parse as parse_date
+import argparse
+from datetime import datetime
 
-# 1) Initialize a BERT‐NER pipeline once (caching the model in memory)
 NER_MODEL = pipeline(
     "ner",
     model="dbmdz/bert-large-cased-finetuned-conll03-english",
-    aggregation_strategy="simple"  # merge contiguous tokens into single span
+    aggregation_strategy="simple"
 )
 
 def fetch_plaintext(url, timeout=10):
-    """Download URL and return visible text (all <body> text)."""
     resp = requests.get(url, timeout=timeout, headers={"User-Agent": "Mozilla/5.0"})
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -23,12 +23,7 @@ def fetch_plaintext(url, timeout=10):
     return soup.get_text(separator=" ", strip=True), soup
 
 def ner_extract(text):
-    """
-    Run the NER pipeline on `text`, return two sets:
-      • names: list of PER spans
-      • norps: list of NORP spans (nationalities/groups)
-    """
-    results = NER_MODEL(text[:50_000])  # limit length to first 50k chars
+    results = NER_MODEL(text[:50_000])
     names = []
     norps = []
     for ent in results:
@@ -38,7 +33,7 @@ def ner_extract(text):
             names.append(span)
         elif label == "NORP":
             norps.append(span)
-    # Deduplicate while preserving order
+            
     def unique(seq):
         seen = set()
         out = []
@@ -51,9 +46,6 @@ def ner_extract(text):
     return unique(names), unique(norps)
 
 def extract_birthday(text):
-    """
-    Same regex as before, but applied to the entire page text.
-    """
     patterns = [
         r"Born\s+([A-Za-z]{3,9}\s+\d{1,2},\s*\d{4})",
         r"Born[:\s]+(\d{4}-\d{2}-\d{2})",
@@ -71,25 +63,16 @@ def extract_birthday(text):
     return None
 
 def extract_job_keywords(text):
-    """
-    Heuristic: look for common occupation keywords near the top of the page.
-    Return the first match of a known occupation.
-    """
     occupations = [
         "Film Director", "Director", "Actor", "Actress", "Writer",
         "Producer", "Screenwriter", "Cinematographer", "Composer"
     ]
-    # Check each keyword—case insensitive
     for occ in occupations:
         if re.search(rf"\b{re.escape(occ)}\b", text, re.IGNORECASE):
             return occ
     return None
 
 def extract_official_links(soup, base_domain):
-    """
-    Unchanged: collect <a href> whose domain matches IMDb/Wikipedia/Instagram
-    or equals base_domain.
-    """
     allowed = {"imdb.com", "wikipedia.org", "instagram.com"}
     out = set()
     for a in soup.find_all("a", href=True):
@@ -108,9 +91,6 @@ def extract_official_links(soup, base_domain):
     return list(out)
 
 def extract_known_for(soup, base_domain):
-    """
-    (Same as before: IMDb's “Known for” or Wikipedia “Known for” infobox.)
-    """
     known_for = []
     if "imdb.com" in base_domain:
         for div in soup.select("div.knownfor-title-role"):
@@ -130,10 +110,6 @@ def extract_known_for(soup, base_domain):
 
 
 def phase4_with_bert(phase3_data, verbose=False):
-    """
-    Replace the earlier phase4_text_mining with BERT‐NER based extraction.
-    Returns a list of objects in the Phase 4 schema.
-    """
     results4 = []
     for entry in phase3_data:
         link = entry.get("link")
@@ -161,18 +137,14 @@ def phase4_with_bert(phase3_data, verbose=False):
             })
             continue
 
-        # 1) Run BERT- NER on the visible text
         names, norps = ner_extract(page_text)
         name = names[0] if names else None
         nationality = norps[0] if norps else None
 
-        # 2) Extract birthday by regex
         birthday = extract_birthday(page_text)
 
-        # 3) Extract job keyword
         job = extract_job_keywords(page_text)
 
-        # 4) Official links + known_for using soup
         official_links = extract_official_links(soup, domain)
         known_for      = extract_known_for(soup, domain)
 
@@ -201,9 +173,6 @@ def phase4_with_bert(phase3_data, verbose=False):
 
 
 def phase5_assemble(phase4_data, query_image_url):
-    """
-    Same as before: build the final Phase 5 JSON.
-    """
     assembled = []
     for idx, ent in enumerate(phase4_data, start=1):
         ext = ent["extracted"]
@@ -227,9 +196,6 @@ def phase5_assemble(phase4_data, query_image_url):
 
 
 if __name__ == "__main__":
-    import argparse
-    from datetime import datetime
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--phase3_json", default="/home/xulei/shayan/DIP/rapidapi.json",
@@ -249,7 +215,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # 1) Load Phase 3
     with open(args.phase3_json, "r") as f:
         p3 = json.load(f)
     data3 = p3.get("data", [])
@@ -258,7 +223,6 @@ if __name__ == "__main__":
 
     query_image_url = p3.get("parameters", {}).get("url", "")
 
-    # 2) Phase 4 with BERT
     phase4_data = phase4_with_bert(data3, verbose=args.verbose)
     with open(args.out_phase4, "w") as f4:
         json.dump(phase4_data, f4, indent=2)
@@ -267,7 +231,6 @@ if __name__ == "__main__":
         print(f"\n[*] Phase 4 (BERT‐NER) written to {args.out_phase4} "
               f"({len(phase4_data)} entries)")
 
-    # 3) Phase 5 assembly
     phase5_obj = phase5_assemble(phase4_data, query_image_url)
     with open(args.out_phase5, "w") as f5:
         json.dump(phase5_obj, f5, indent=2)

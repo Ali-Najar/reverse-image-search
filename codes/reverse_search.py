@@ -22,18 +22,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-from DIP.codes.preprocess import prepare_face
-from DIP.codes.feature_extraction import load_model, get_embedding
+from preprocess import prepare_face
+from feature_extraction import load_model, get_embedding
 
 
 def generate_random_profile_name(length=8):
-    """Generate a random profile name to avoid conflicts"""
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
 
 def setup_chrome_with_manual_captcha():
-    """Ultra-reliable Chrome setup with multiple fallbacks"""
-    # First try: Regular incognito mode
     try:
         chrome_options = Options()
         chrome_options.add_argument("--incognito")
@@ -43,8 +40,6 @@ def setup_chrome_with_manual_captcha():
         return webdriver.Chrome(options=chrome_options)
     except Exception as e:
         print(f"[-] First attempt failed: {e}")
-    
-    # Second try: Fresh temp profile with proper cleanup
     try:
         temp_dir = Path(tempfile.mkdtemp(prefix="chrome_temp_"))
         print(f"[*] Using temporary profile: {temp_dir}")
@@ -57,15 +52,12 @@ def setup_chrome_with_manual_captcha():
         
         driver = webdriver.Chrome(options=chrome_options)
         
-        # Add cleanup handler
         driver.cleanup = lambda: shutil.rmtree(temp_dir, ignore_errors=True)
         return driver
     except Exception as e:
         print(f"[-] Second attempt failed: {e}")
         if 'temp_dir' in locals():
             shutil.rmtree(temp_dir, ignore_errors=True)
-    
-    # Third try: Portable Chrome with no profile at all
     try:
         chrome_options = Options()
         chrome_options.add_argument("--window-size=1200,800")
@@ -81,16 +73,11 @@ def setup_chrome_with_manual_captcha():
                          "Please check your Chrome installation and try again.")
 
 
-def google_images_upload_and_wait(driver: webdriver.Chrome, query_image_path: Path, max_results: int, verbose: bool = False):
-    """
-    Improved version with better error handling and user guidance.
-    """
-    # 1) Navigate to Google Images
+def google_images_upload_and_wait(driver, query_image_path, max_results, verbose=False):
     driver.get("https://images.google.com/?hl=en")
     if verbose:
         print("[1] Opened Google Images")
 
-    # 2) Handle cookie consent
     try:
         consent_btn = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Accept all')]"))
@@ -103,7 +90,6 @@ def google_images_upload_and_wait(driver: webdriver.Chrome, query_image_path: Pa
         if verbose:
             print("[2] No cookie banner found")
 
-    # 3) Click the camera icon with multiple selector options
     camera_selectors = [
         "div[aria-label='Search by image']",
         "div#qbi",
@@ -133,9 +119,8 @@ def google_images_upload_and_wait(driver: webdriver.Chrome, query_image_path: Pa
             print(f"[!] Camera click attempt {attempt+1} failed, retrying...")
             time.sleep(2)
 
-    time.sleep(1)  # Wait for upload dialog
-
-    # 4) Upload the image
+    time.sleep(1)
+    
     try:
         file_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
@@ -146,7 +131,6 @@ def google_images_upload_and_wait(driver: webdriver.Chrome, query_image_path: Pa
     except Exception as e:
         raise RuntimeError(f"Failed to upload image: {e}")
 
-    # 5) Manual CAPTCHA solve prompt
     print("\n" + "="*60)
     print("🚨 IMPORTANT: Check the browser window now!")
     print("1. If you see a CAPTCHA, solve it completely")
@@ -155,7 +139,6 @@ def google_images_upload_and_wait(driver: webdriver.Chrome, query_image_path: Pa
     print("="*60 + "\n")
     input()
 
-    # 6) Wait for results with extended timeout
     try:
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-ri], a.wXeWr.islib.NFQFxe, div[jscontroller]"))
@@ -170,7 +153,6 @@ def google_images_upload_and_wait(driver: webdriver.Chrome, query_image_path: Pa
         print("    - The page structure changed")
         print("[!] Trying to proceed anyway...")
 
-    # 7) Get results with multiple selector options
     result_selectors = [
         "a.wXeWr.islib.NFQFxe",
         "div[data-ri]",
@@ -204,7 +186,6 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Verbose output")
     args = parser.parse_args()
 
-    # Load model and compute query embedding
     if args.verbose:
         print("[*] Loading model...")
     model = load_model(device=args.device)
@@ -215,7 +196,6 @@ def main():
     if args.verbose:
         print("[*] Computed query embedding")
 
-    # Setup Chrome and perform search
     driver, profile_dir = None, None
     try:
         driver, profile_dir = setup_chrome_with_manual_captcha()
@@ -232,7 +212,6 @@ def main():
         if driver:
             driver.quit()
 
-    # Process results
     pairs = []
     for i, a in enumerate(anchors):
         try:
@@ -255,7 +234,6 @@ def main():
                 print(f"    • Skipping result #{i+1}: {str(e)}")
             continue
 
-    # Download and compare thumbnails
     candidates = []
     download_dir = Path(args.download_dir)
     for thumb_url, page_url in tqdm(pairs, desc="Processing results"):
@@ -286,7 +264,6 @@ def main():
                 print(f"    [!] Error processing {thumb_url}: {str(e)}")
             continue
 
-    # Save results
     candidates.sort(key=lambda x: x["similarity"], reverse=True)
     os.makedirs(Path(args.out_json).parent, exist_ok=True)
     with open(args.out_json, "w") as f:
@@ -295,7 +272,6 @@ def main():
     if args.verbose:
         print(f"\n[*] Saved {len(candidates)} matches to {args.out_json}")
 
-    # Clean up profile if temporary
     if args.profile_dir is None and profile_dir and profile_dir.exists():
         try:
             shutil.rmtree(profile_dir)

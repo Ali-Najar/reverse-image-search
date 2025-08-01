@@ -1,8 +1,6 @@
 import sys
 import asyncio
 if sys.platform.startswith("win"):
-    # Windows’ default SelectorEventLoop doesn’t support subprocesses;
-    # switch to Proactor before importing any asyncio/Playwright code.
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 import streamlit as st
 from get_bio_markdown import get_markdown
@@ -10,7 +8,6 @@ from get_bio_markdown import get_markdown
 # ------------ Page setup ------------
 st.set_page_config(page_title="Reverse Image Search", page_icon="🔍", layout="centered")
 
-# Inject a bit of CSS to mimic ChatGPT look & feel
 st.markdown(
     """
     <style>
@@ -44,22 +41,18 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ------------ Helper & state ------------
 if "history" not in st.session_state:
-    # Each item: (role, content)
     st.session_state.history = []
 
 history = st.session_state.history
 
 
-# ------------ Input area ------------
 with st.form(key="chat_form", clear_on_submit=True):
     url = st.text_input("Paste image URL and press Enter", placeholder="https://...")
     submitted = st.form_submit_button("Enter")
 
 
 if submitted and url:
-    # Clear previous chat and results
     st.session_state.history.clear()
     if "image_url" in st.session_state:
         del st.session_state.image_url
@@ -72,9 +65,7 @@ if submitted and url:
         except Exception as e:
             response_markdown = f"**Error:** {e}"
     history.append(("assistant", response_markdown))
-    # Save current image URL for display below chat
     st.session_state.image_url = url
-    # Trigger a fresh render; handle both new and legacy Streamlit APIs
     if hasattr(st, "rerun"):
         st.rerun()
     elif hasattr(st, "experimental_rerun"):
@@ -85,7 +76,6 @@ assistant_messages = [msg for role, msg in history if role == "assistant"]
 if assistant_messages:
     st.markdown("---")
     if "image_url" in st.session_state:
-        # Centered image
         left, center, right = st.columns([1, 2, 1])
         with center:
             st.markdown(
@@ -98,5 +88,4 @@ if assistant_messages:
             )
 
     st.markdown("### Biography")
-    # Display the latest assistant response
     st.markdown(assistant_messages[-1], unsafe_allow_html=True) 
