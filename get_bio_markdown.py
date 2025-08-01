@@ -16,7 +16,7 @@ def get_markdown(image_url):
         image_req = requests.get(image_url)
         if image_req.status_code == 200:
             with open("data/tmp_img.png", "wb") as file:
-                file.write(response.content)
+                file.write(image_req.content)
         
         image_url = prepare_and_upload(IMGBB_API_KEY, "data/tmp_img.png")
 

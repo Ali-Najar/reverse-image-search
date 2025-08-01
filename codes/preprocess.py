@@ -51,7 +51,7 @@ def prepare_face(input_path):
 
     # 2. Denoise + enhance
     img_bgr = _denoise(img_bgr)
-    img_bgr = _extract_faces(img_bgr)
+    # img_bgr = _extract_faces(img_bgr)
     # img_bgr = _adjust_contrast_brightness(img_bgr)
 
     # 3. Detect & align (expects RGB PIL image)
