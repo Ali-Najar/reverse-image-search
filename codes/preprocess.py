@@ -44,7 +44,7 @@ def _extract_faces(image):
     return face_image
 
 
-def prepare_face(input_path, output_dir, output_name=None):
+def prepare_face(input_path):
     img_bgr = cv2.imread(str(input_path))
     if img_bgr is None:
         raise ValueError(f"Could not read image: {input_path}")

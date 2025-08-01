@@ -5,7 +5,10 @@ from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 import time
 from playwright.sync_api import sync_playwright
-from codes imp
+from codes.preprocess import prepare_face
+import io
+import cv2
+from PIL import Image
 
 def fetch_plaintext(url, timeout=10, headless=True):
     """
@@ -115,12 +118,15 @@ def _parse_html(html):
 
 def upload_image_imgbb(api_key, image_path):
     url = "https://api.imgbb.com/1/upload"
-    with open(image_path, "rb") as image_file:
-        payload = {
-            "key": api_key,
-            "image": image_file.read(),
-        }
-        response = requests.post(url, files={"image": (image_path, image_file)}, data={"key": api_key})
+    face = prepare_face(image_path)  # Returns numpy ndarray in BGR format
+    face_rgb = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+    with io.BytesIO() as buffer:
+        pil_face = Image.fromarray(face_rgb)
+        pil_face.save(buffer, format='JPEG')
+        buffer.seek(0)
+        files = {"image": ("face.jpg", buffer, "image/jpeg")}
+        data = {"key": api_key}
+        response = requests.post(url, files=files, data=data)
         if response.status_code == 200:
             return response.json()['data']['url']
         else:
